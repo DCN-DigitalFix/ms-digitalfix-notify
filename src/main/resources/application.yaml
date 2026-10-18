@@ -1,0 +1,87 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: ms-digitalfix-notify
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://login.microsoftonline.com/a6a0c27e-18a7-4209-bd1b-32338be5cb66/v2.0
+
+  rabbitmq:
+    # Los dos nodos del cluster. Si el primero cae, la conexion pasa al segundo.
+    addresses: ${RABBIT_ADDRESSES:localhost:5672,localhost:5673}
+    # No se usa guest: RabbitMQ lo bloquea para cualquier conexion que no venga
+    # del propio broker, asi que desde otro host o contenedor nunca conecta.
+    username: ${RABBIT_USER:digitalfix}
+    password: ${RABBIT_PASS:digitalfix}
+    virtual-host: /
+    listener:
+      simple:
+        # ACK manual: el consumidor decide cuando confirmar, reintentar o
+        # descartar. Sin esto Spring confirma solo y un fallo pierde el mensaje.
+        acknowledge-mode: manual
+        prefetch: 10
+        concurrency: 2
+        max-concurrency: 5
+
+digitalfix:
+  security:
+    audiences:
+      - 8e5e408b-c101-4bc1-a5d3-01f702720462
+      - api://8e5e408b-c101-4bc1-a5d3-01f702720462
+  cors:
+    allowed-origins:
+      - http://localhost:4200
+      - https://44.206.195.117
+
+  # ---------------------------------------------------------------------------
+  # Topologia de mensajeria.
+  #
+  # Todos los nombres de colas, exchanges, routing keys y limites de reintento
+  # viven aqui. Ninguna clase los escribe a mano: se inyectan via
+  # RabbitProperties. Cambiar un nombre de cola es editar este archivo, no
+  # buscar por el codigo.
+  #
+  # Los nombres siguen la topologia definida en el caso DigitalFix.
+  # ---------------------------------------------------------------------------
+  rabbit:
+    exchanges:
+      direct: cmd.direct
+      topic: cmd.topic
+      dlx: cmd.dead.dlx
+
+    flujos:
+      # Notificacion al cliente: orden asignada, tecnico en camino, cerrada.
+      email:
+        cola: q.cmd.email
+        dlq: q.cmd.email.dlq
+        routing-key-direct: email.send
+        routing-key-topic: email.*
+        routing-key-dlq: email.dlq
+        max-reintentos: 3
+
+      # Ticket de despacho a terreno para la cuadrilla.
+      dispatch:
+        cola: q.cmd.dispatch
+        dlq: q.cmd.dispatch.dlq
+        routing-key-direct: dispatch.ticket
+        routing-key-topic: dispatch.#
+        routing-key-dlq: dispatch.dlq
+        max-reintentos: 5
+
+      # Generacion de PDF: informe tecnico o certificado de trabajo.
+      report:
+        cola: q.cmd.report
+        dlq: q.cmd.report.dlq
+        routing-key-direct: report.gen
+        routing-key-topic: report.*
+        routing-key-dlq: report.dlq
+        max-reintentos: 2
+
+logging:
+  level:
+    cl.duoc.ms_digitalfix_notify: INFO
