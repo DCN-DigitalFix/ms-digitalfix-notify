@@ -3,6 +3,7 @@ package cl.duoc.ms_digitalfix_notify.controller;
 import java.time.LocalDateTime;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,7 @@ public class HealthController {
 
     private final DlqMonitor dlqMonitor;
 
+    @Autowired
     public HealthController(DlqMonitor dlqMonitor) {
         this.dlqMonitor = dlqMonitor;
     }
