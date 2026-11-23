@@ -41,9 +41,11 @@ public class RabbitSerializationConfig {
 
         DefaultJackson2JavaTypeMapper typeMapper = new DefaultJackson2JavaTypeMapper();
         typeMapper.setTypePrecedence(Jackson2JavaTypeMapper.TypePrecedence.INFERRED);
-        typeMapper.setTrustedPackages("cl.duoc.*");
+        typeMapper.setTrustedPackages(
+                "cl.duoc.ms_digitalfix_notify.messaging",
+                "cl.duoc.ms_digitalfix_workorders.messaging",
+                "cl.duoc.ms_digitalfix_bff.messaging");
         converter.setJavaTypeMapper(typeMapper);
-
         return converter;
     }
 }
