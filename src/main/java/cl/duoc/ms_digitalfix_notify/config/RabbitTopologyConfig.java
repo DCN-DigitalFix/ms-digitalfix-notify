@@ -39,12 +39,8 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(RabbitProperties.class)
 public class RabbitTopologyConfig {
 
-    private final RabbitProperties props;
-
     @Autowired
-    public RabbitTopologyConfig(RabbitProperties props) {
-        this.props = props;
-    }
+    private RabbitProperties props;
 
     // -----------------------------------------------------------------------
     // Exchanges

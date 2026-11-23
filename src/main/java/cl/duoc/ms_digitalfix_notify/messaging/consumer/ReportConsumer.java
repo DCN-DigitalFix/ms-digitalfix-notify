@@ -34,19 +34,14 @@ public class ReportConsumer {
 
     private static final Logger log = LoggerFactory.getLogger(ReportConsumer.class);
 
-    private final ReportService reportService;
-    private final ControlReintentos control;
-    private final int maxReintentos;
+    @Autowired
+    private ReportService reportService;
 
     @Autowired
-    public ReportConsumer(
-            ReportService reportService,
-            ControlReintentos control,
-            @Value("${digitalfix.rabbit.flujos.report.max-reintentos}") int maxReintentos) {
-        this.reportService = reportService;
-        this.control = control;
-        this.maxReintentos = maxReintentos;
-    }
+    private ControlReintentos control;
+
+    @Value("${digitalfix.rabbit.flujos.report.max-reintentos}")
+    private int maxReintentos;
 
     @RabbitListener(queues = "${digitalfix.rabbit.flujos.report.cola}")
     public void recibir(

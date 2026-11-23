@@ -46,19 +46,14 @@ public class EmailConsumer {
 
     private static final Logger log = LoggerFactory.getLogger(EmailConsumer.class);
 
-    private final EmailService emailService;
-    private final ControlReintentos control;
-    private final int maxReintentos;
+    @Autowired
+    private EmailService emailService;
 
     @Autowired
-    public EmailConsumer(
-            EmailService emailService,
-            ControlReintentos control,
-            @Value("${digitalfix.rabbit.flujos.email.max-reintentos}") int maxReintentos) {
-        this.emailService = emailService;
-        this.control = control;
-        this.maxReintentos = maxReintentos;
-    }
+    private ControlReintentos control;
+
+    @Value("${digitalfix.rabbit.flujos.email.max-reintentos}")
+    private int maxReintentos;
 
     @RabbitListener(queues = "${digitalfix.rabbit.flujos.email.cola}")
     public void recibir(

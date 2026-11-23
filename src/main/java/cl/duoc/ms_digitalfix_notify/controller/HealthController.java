@@ -22,12 +22,8 @@ import cl.duoc.ms_digitalfix_notify.messaging.consumer.DlqMonitor;
 @RequestMapping("/api")
 public class HealthController {
 
-    private final DlqMonitor dlqMonitor;
-
     @Autowired
-    public HealthController(DlqMonitor dlqMonitor) {
-        this.dlqMonitor = dlqMonitor;
-    }
+    private DlqMonitor dlqMonitor;
 
     @GetMapping("/health")
     public ResponseEntity<Map<String, Object>> health() {

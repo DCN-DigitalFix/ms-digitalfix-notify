@@ -34,19 +34,14 @@ public class DispatchConsumer {
 
     private static final Logger log = LoggerFactory.getLogger(DispatchConsumer.class);
 
-    private final DispatchService dispatchService;
-    private final ControlReintentos control;
-    private final int maxReintentos;
+    @Autowired
+    private DispatchService dispatchService;
 
     @Autowired
-    public DispatchConsumer(
-            DispatchService dispatchService,
-            ControlReintentos control,
-            @Value("${digitalfix.rabbit.flujos.dispatch.max-reintentos}") int maxReintentos) {
-        this.dispatchService = dispatchService;
-        this.control = control;
-        this.maxReintentos = maxReintentos;
-    }
+    private ControlReintentos control;
+
+    @Value("${digitalfix.rabbit.flujos.dispatch.max-reintentos}")
+    private int maxReintentos;
 
     @RabbitListener(queues = "${digitalfix.rabbit.flujos.dispatch.cola}")
     public void recibir(
